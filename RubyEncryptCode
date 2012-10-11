@@ -1,56 +1,72 @@
 def encode (input='split test', to_code=true, seed=0)
-#input='split test'
-#seed = 0
-source = 3.1415926535897932384626433
-#to_code=true
+  #input='split test'
+  #seed = 0
+  source = 3.1415926535897932384626433
+  #to_code=true, false, or 13
 
-decode= ''
-ascii=[]
+  decode= ''
+  ascii=[]
 
-#This picks whether you're doing or undoing code
-if to_code == false
-    to_code_coefficient= -1
-else
-    to_code_coefficient=1
+  #This picks whether you're doing or undoing code
+  if to_code == false
+      to_code_coefficient= -1
+  elsif to_code == 13
+      to_code_coefficient = 1
+  else
+      to_code_coefficient=1
+  end
+
+  #Breaks the input string into pieces and converts to ascii
+  splitcode=input.split(%r{\s*})
+
+  input.each_byte do |c|
+       ascii << c
+  end
+
+
+  #Actually converts to encoded ascii and then to text
+  if to_code != 13
+    splitsource =source.to_s.split(%r{\s*}) - ['.']
+    for i in 0..ascii.length-1
+      ascii[i] += to_code_coefficient * splitsource[i+seed].to_i
+      decode << ascii[i].chr
+    end
+    #  if ascii[i]>126
+     #     ascii[i] += -(126-31)
+      #end
+  # Ascii greater than 126 or less than 31 aren't characters
+
+
+   #   if ( ascii[i] >=  65 and ascii[i] <= 65+25 ) or ( ascii[i] >=  97 and ascii[i] <= 97+25 )
+
+
+
+    #  else
+    #      puts 'fail'
+   #   end
+
+  #13 shift
+  else
+    for i in 0..ascii.length-1
+      if ascii[i]>=65 and ascii[i] <=90
+        ascii[i]+=13
+        if ascii[i]>90
+          ascii[i] += -26
+        end
+      elsif ascii[i]>=97 and ascii[i]<=122
+        ascii[i]
+        if ascii[i]>122
+          ascii[i] += -26
+        end
+      end
+      decode << ascii[i].chr
+    end
+  end
+  decode
 end
+#puts encode('Hi', true, 0)
 
-#Breaks the input string into pieces and converts to ascii
-splitcode=input.split(%r{\s*})
-
-input.each_byte do |c|
-     ascii << c
-end
-
-
-#Actually converts to encoded ascii and then to text
-
-splitsource =source.to_s.split(%r{\s*}) - ['.']
-for i in 0..ascii.length-1
-    ascii[i] += to_code_coefficient * splitsource[i+seed].to_i
-
-  #  if ascii[i]>126
-   #     ascii[i] += -(126-31)
-    #end
-# Ascii greater than 126 or less than 31 aren't characters
-
-
- #   if ( ascii[i] >=  65 and ascii[i] <= 65+25 ) or ( ascii[i] >=  97 and ascii[i] <= 97+25 )
-
-        decode << ascii[i].chr
-
-  #  else
-  #      puts 'fail'
- #   end
-     
-end
-decode
-
-end
-puts encode('Hi', true, 0)
-
-#puts decode
-
-
+ #puts decode
 
 #This should take user input
 #STDOUT.flush
@@ -64,7 +80,8 @@ puts encode('Hi', true, 0)
 
 
 
+  #This section hopes to compute pi however much I wish
+  #a resource I could look at is http://rubyquiz.strd6.com/quizzes/202-digits-of-pi
+  #pi= (4.0/(8*k+1)-2.0/(8*k+4)-1.0/(8*k+5)-1.0/(8*k+6)) / (16**k)
 
-pi= (4.0/(8*k+1)-2.0/(8*k+4)-1.0/(8*k+5)-1.0/(8*k+6)) / (16**k)
-
-#Pi = SUMk=0 to infinity 16-k [ 4/(8k+1) - 2/(8k+4) - 1/(8k+5) - 1/(8k+6) ].
+  #Pi = SUMk=0 to infinity 16-k [ 4/(8k+1) - 2/(8k+4) - 1/(8k+5) - 1/(8k+6) ].
