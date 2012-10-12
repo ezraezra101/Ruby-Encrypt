@@ -1,17 +1,17 @@
 #!/usr/bin/env ruby
-def encode (input='split test', to_code=true, seed=0)
+def encode(input='split test', to_code=true, seed=0)
   #input='split test'
   #seed = 0
   source = 3.1415926535897932384626433
   #to_code=true, false, or 13
-
   decode= ''
   ascii=[]
 
   #This picks whether you're doing or undoing code
-  if to_code == false
+  case to_code
+  when false
       to_code_coefficient= -1
-  elsif to_code == 13
+  when true
       to_code_coefficient = 1
   else
       to_code_coefficient=1
@@ -48,7 +48,7 @@ def encode (input='split test', to_code=true, seed=0)
 
   #13 shift
   else
-    for i in 0..ascii.length-1
+    for i in 0..ascii.length-1       
       if ascii[i]>=65 and ascii[i] <=90
         ascii[i]+=13
         if ascii[i]>90
@@ -76,24 +76,27 @@ def run()
   input = gets.chomp
   puts 'Are you doing a rotate 13 cipher? Y/N'
   typeofencode=gets.chomp
-  if typeofencode=='Y' or typeofencode=='y' or typeofencode=='yes' or typeofencode=='Yes'
+  case typeofencode
+  when 'Y', 'y', 'yes', 'Yes'
     to_code=13
   else
     puts 'What is your seed? (0 for none)'
     seed=gets.chomp.to_i
     puts 'Are you decoding? Y/N'
-    typeofencode=gets.chomp
-    if typeofencode=='Y' or typeofencode=='y' or typeofencode=='yes' or typeofencode=='Yes'
-      to_code=false
-    else
+    encoding=gets.chomp
+    case encoding
+    when 'Y', 'y', 'yes', 'Yes'
       to_code=true
+    else
+      to_code=false
     end
   end
   puts 'Here is your encrypted text:'
   puts encode(input,to_code,seed)
   puts 'would you like to encode more? Y/N'
   again=gets.chomp
-  if again=='Y' or again=='y' or again=='yes' or again=='Yes'
+  case again
+  when 'Y', 'y', 'yes', 'Yes'
     run()
   else
     puts 'Bye'
@@ -105,15 +108,12 @@ end
 
 
 
-
-
-
-
-
   #This section hopes to compute pi however much I wish
   #a resource I could look at is http://rubyquiz.strd6.com/quizzes/202-digits-of-pi
   #pi= (4.0/(8*k+1)-2.0/(8*k+4)-1.0/(8*k+5)-1.0/(8*k+6)) / (16**k)
 
   #Pi = SUMk=0 to infinity 16-k [ 4/(8k+1) - 2/(8k+4) - 1/(8k+5) - 1/(8k+6) ].
+  #ruby info:
+  #http://www.ruby-lang.org/en/libraries/
 
   run()
