@@ -54,7 +54,7 @@ def encode (input='split test', to_code=true, seed=0)
           ascii[i] += -26
         end
       elsif ascii[i]>=97 and ascii[i]<=122
-        ascii[i]
+        ascii[i] +=13
         if ascii[i]>122
           ascii[i] += -26
         end
@@ -69,8 +69,37 @@ end
  #puts decode
 
 #This should take user input
-#STDOUT.flush
-#to_code = gets.chomp
+def run()
+  STDOUT.flush
+  puts 'Paste your message in here'
+  input = gets.chomp
+  puts 'Are you doing a rotate 13 cipher? Y/N'
+  typeofencode=gets.chomp
+  if typeofencode=='Y' or typeofencode=='y' or typeofencode=='yes' or typeofencode=='Yes'
+    to_code=13
+  else
+    puts 'What is your seed? (0 for none)'
+    seed=gets.chomp.to_i
+    puts 'Are you decoding? Y/N'
+    typeofencode=gets.chomp
+    if typeofencode=='Y' or typeofencode=='y' or typeofencode=='yes' or typeofencode=='Yes'
+      to_code=false
+    else
+      to_code=true
+    end
+  end
+  puts 'Here is your encrypted text:'
+  puts encode(input,to_code,seed)
+  puts 'would you like to encode more? Y/N'
+  again=gets.chomp
+  if again=='Y' or again=='y' or again=='yes' or again=='Yes'
+    run()
+  else
+    puts 'Bye'
+  end
+end
+
+
 
 
 
@@ -85,3 +114,5 @@ end
   #pi= (4.0/(8*k+1)-2.0/(8*k+4)-1.0/(8*k+5)-1.0/(8*k+6)) / (16**k)
 
   #Pi = SUMk=0 to infinity 16-k [ 4/(8k+1) - 2/(8k+4) - 1/(8k+5) - 1/(8k+6) ].
+
+  run()
