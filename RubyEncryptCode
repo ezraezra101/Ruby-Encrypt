@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 def encode (input='split test', to_code=true, seed=0)
   #input='split test'
   #seed = 0
