@@ -3,4 +3,4 @@ Ruby-Encrypt
 
 A simple way to encrypt things, written with Ruby
 
-Ruby Code is the older version
+I am currently trying to add RSA style encryption.

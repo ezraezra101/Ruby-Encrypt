@@ -103,11 +103,33 @@ def run()
   end
 end
 
-
-
-
-
-
+#This is really insecure. I'm also putting it online . . . Why am I using it for encryption?
+#http://mathcircle.berkeley.edu/BMC3/rsa/node4.html
+$pubkey=1
+def rsa_private_keygen()
+  $privatekey = [23,41]
+end
+def rsa_pub_keygen()
+  for i in 0..$privatekey.length-1
+    $pubkey*=$privatekey[i]
+  end
+end
+def to_rsa(input, pubkey, e)
+  output=(input**e)%pubkey
+  puts output
+end
+def from_rsa(input,p,q, e)
+  #(e*d=1 )% ((p-1)*(q-1))
+  i=4
+  de=i*((p-1)*(q-1))+1
+  d=de/e
+  puts (input**d)% $pubkey
+end
+rsa_private_keygen()
+rsa_pub_keygen()
+to_rsa(35,$pubkey,7)
+puts $privatekey
+puts $pubkey
   #This section hopes to compute pi however much I wish
   #a resource I could look at is http://rubyquiz.strd6.com/quizzes/202-digits-of-pi
   #pi= (4.0/(8*k+1)-2.0/(8*k+4)-1.0/(8*k+5)-1.0/(8*k+6)) / (16**k)
@@ -116,4 +138,5 @@ end
   #ruby info:
   #http://www.ruby-lang.org/en/libraries/
 
-  run()
+
+ # run()
