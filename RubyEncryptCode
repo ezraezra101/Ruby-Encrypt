@@ -103,11 +103,18 @@ def run()
   end
 end
 
+#Section for RSA encryption:
+#Note: Variables are all named not according to convention
 #This is really insecure. I'm also putting it online . . . Why am I using it for encryption?
+
+#Resources:
 #http://mathcircle.berkeley.edu/BMC3/rsa/node4.html
+#http://www.javamex.com/tutorials/cryptography/rsa_encryption.shtml
+#http://en.wikipedia.org/wiki/RSA_%28algorithm%29#Decryption
+#For the decrypting raising to a power: http://en.wikipedia.org/wiki/Square-and-multiply_algorithm
 $pubkey=1
 def rsa_private_keygen()
-  $privatekey = [23,41]
+  $privatekey = [61,53]
 end
 def rsa_pub_keygen()
   for i in 0..$privatekey.length-1
@@ -120,8 +127,11 @@ def to_rsa(input, pubkey, e)
 end
 def from_rsa(input,p,q, e)
   #(e*d=1 )% ((p-1)*(q-1))
-  i=4
-  de=i*((p-1)*(q-1))+1
+  i=1
+  #(p-1)*(q-1) is called Euler's totient function, it gives the number of integers that are coprime (share no factors) of a positive number
+  #de=i*((p-1)*(q-1))+1
+  totient=(p-1)*(q-1)
+  de=$pubkey%totient
   d=de/e
   puts (input**d)% $pubkey
 end
