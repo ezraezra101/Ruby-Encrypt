@@ -123,7 +123,7 @@ def rsa_pub_keygen()
 end
 def to_rsa(input, pubkey, e)
   output=(input**e)%pubkey
-  puts output
+  output
 end
 def from_rsa(input,p,q, e)
   #(e*d=1 )% ((p-1)*(q-1))
@@ -131,13 +131,18 @@ def from_rsa(input,p,q, e)
   #(p-1)*(q-1) is called Euler's totient function, it gives the number of integers that are coprime (share no factors) of a positive number
   #de=i*((p-1)*(q-1))+1
   totient=(p-1)*(q-1)
-  de=$pubkey%totient
-  d=de/e
+  d=(1/e)%totient
+  #d=de/e
   puts (input**d)% $pubkey
 end
 rsa_private_keygen()
 rsa_pub_keygen()
-to_rsa(35,$pubkey,7)
+mesg=to_rsa(800000,$pubkey,7)
+puts "mesg"
+puts mesg
+puts "From_rsa"
+from_rsa(mesg,61,53,7)
+puts "keys"
 puts $privatekey
 puts $pubkey
   #This section hopes to compute pi however much I wish
@@ -150,3 +155,17 @@ puts $pubkey
 
 
  # run()
+
+
+
+#Will's gui code:
+Shoes.app :width=>400, :height=>340 do
+  flow do
+    @e=edit_line
+    button "Go!" do
+      @abc.text = encode(@e.text,13)
+    end
+    @abc=edit_line
+  end
+end
+
