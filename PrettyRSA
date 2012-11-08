@@ -33,18 +33,18 @@ def to_rsa(input, n, e)
   output
 end
 
-def from_rsa(input, d, n)
+def from_rsa(input, n, d)
   output=(input**d)%n
   output
 end
 
 make_rsa_key(17)
 mesg=65
-encrypted=to_rsa(mesg,$e)
+encrypted=to_rsa(mesg,$n,$e)
 puts "encrypted"
 puts encrypted
 puts "From_rsa"
-puts from_rsa(encrypted,$d, $n)
+puts from_rsa(encrypted,$n,$d)
 puts "keys"
 puts $d
 puts $n
