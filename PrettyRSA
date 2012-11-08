@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 def make_rsa_key(e)
   primes=primegen()
   $n, $d = rsa_keygen(e,primes)
@@ -10,7 +11,7 @@ def primegen()
   primes
 end
 
-def rsa_keygen(e,*primes)
+def rsa_keygen(e,primes)
   n=1
   totient=1
   semiarbitrary=15
@@ -22,8 +23,9 @@ def rsa_keygen(e,*primes)
 
   d= (totient*semiarbitrary + 1)/e
 
-  n
-  d
+  privatekey=[n,d]
+  publickey=[n,e]
+  privatekey
 end
 
 def to_rsa(input, n, e)
