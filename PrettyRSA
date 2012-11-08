@@ -1,0 +1,115 @@
+def rsa_keygen()
+#  primes = [61,53]
+  primes = [11,13]
+
+  for i in 0..primes.length-1
+    $pubkey*=primes[i]
+  end
+end
+
+def to_rsa(input, N, e)
+  output=(input**e)%n
+  output
+end
+
+
+pubkey=1
+
+end
+
+def to_rsa(input, pubkey, e)
+  output=(input**e)%pubkey
+  output
+end
+
+
+#gcdext and invert are borrowed from https://gist.github.com/2388745
+#Ruby modular arithmatic
+  def gcdext(x, y)
+    if x < 0
+      g, a, b = gcdext(-x, y)
+      return [g, -a, b]
+    end
+    if y < 0
+      g, a, b = gcdext(x, -y)
+      return [g, a, -b]
+    end
+    r0, r1 = x, y
+    a0 = b1 = 1
+    a1 = b0 = 0
+    until r1.zero?
+      q = r0 / r1
+      r0, r1 = r1, r0 - q*r1
+      a0, a1 = a1, a0 - q*a1
+      b0, b1 = b1, b0 - q*b1
+    end
+    [r0, a0, b0]
+  end
+  
+  # Returns the inverse of `num` modulo `mod`.
+  #
+  # @param [Integer] num the number
+  # @param [Integer] mod the modulus
+  # @return [Integer]
+  # @raise ZeroDivisionError if the inverse of `base` does not exist
+  def invert(num, mod)
+    g, a, b = gcdext(num, mod)
+    unless g == 1
+      raise ZeroDivisionError.new("#{num} has no inverse modulo #{mod}")
+    end
+    a % mod
+  end
+
+
+    
+
+
+
+def from_rsa(input,p,q, e)
+  #(e*d=1 )% ((p-1)*(q-1))
+
+  #Notworking example of finding d
+
+  #e*d = 1 (mod totient)
+  #if e==3 and totient==11
+  # 3*d= 1 (mod 11)
+  #Since 3*4 == 12 (mod 11) ==1
+  # d can equal 4
+  #http://en.wikipedia.org/wiki/Modular_multiplicative_inverse
+
+
+  i=15
+  #(p-1)*(q-1) is called Euler's totient function, it gives the n69umber of integers that are coprime (share no factors) of a positive number
+  #de=i*((p-1)*(q-1))+1
+  totient=(p-1)*(q-1)
+  #doesn't work: d**(totient-1)=d**-1    (mod pq)
+  #d=(1/e)%totient
+  d= (totient*i + 1)/e
+  #d=invert(e,totient)
+  #d=de/e
+  puts (input**d)% $pubkey
+  puts "d"
+  puts d
+end
+
+rsa_private_keygen()
+rsa_pub_keygen()
+mesg=to_rsa(65,$pubkey,17)
+puts "mesg"
+puts mesg
+puts "From_rsa"
+from_rsa(mesg,$privatekey[0], $privatekey[1] ,17)
+puts "keys"
+puts $privatekey
+puts $pubkey
+puts "*********"
+  #This section hopes to compute pi however much I wish
+  #a resource I could look at is http://rubyquiz.strd6.com/quizzes/202-digits-of-pi
+  #pi= (4.0/(8*k+1)-2.0/(8*k+4)-1.0/(8*k+5)-1.0/(8*k+6)) / (16**k)
+
+  #Pi = SUMk=0 to infinity 16-k [ 4/(8k+1) - 2/(8k+4) - 1/(8k+5) - 1/(8k+6) ].
+  #ruby info:
+  #http://www.ruby-lang.org/en/libraries/
+
+
+ # run()
