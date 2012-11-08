@@ -5,8 +5,8 @@ def make_rsa_key(e)
 end
 
 def primegen()
-#  primes = [61,53]
-  primes = [11,13]
+  primes = [61,53]
+#  primes = [11,13]
   primes
 end
 
@@ -14,12 +14,14 @@ def rsa_keygen(e,*primes)
   n=1
   totient=1
   semiarbitrary=15
-  d= (totient*semiarbitrary + 1)/e
 
   for i in 0..primes.length-1
     n*=primes[i]
     totient*=primes[i]-1
   end
+
+  d= (totient*semiarbitrary + 1)/e
+
   n
   d
 end
