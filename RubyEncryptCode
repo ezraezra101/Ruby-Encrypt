@@ -115,7 +115,8 @@ end
 #Prime #s: http://www.bigprimes.net/archive/prime/8/
 $pubkey=1
 def rsa_private_keygen()
-  $privatekey = [5279,6133]
+#  $privatekey = [61,53]
+  $privatekey = [11,13]
 end
 def rsa_pub_keygen()
   for i in 0..$privatekey.length-1
@@ -166,7 +167,7 @@ end
   end
 
 
-
+    
 
 
 
@@ -183,29 +184,31 @@ def from_rsa(input,p,q, e)
   #http://en.wikipedia.org/wiki/Modular_multiplicative_inverse
 
 
-  i=1
-  #(p-1)*(q-1) is called Euler's totient function, it gives the number of integers that are coprime (share no factors) of a positive number
+  i=15
+  #(p-1)*(q-1) is called Euler's totient function, it gives the n69umber of integers that are coprime (share no factors) of a positive number
   #de=i*((p-1)*(q-1))+1
   totient=(p-1)*(q-1)
   #doesn't work: d**(totient-1)=d**-1    (mod pq)
-  d=(1/e)%totient
-  #d= (totient*i + 1)/e
+  #d=(1/e)%totient
+  d= (totient*i + 1)/e
   #d=invert(e,totient)
   #d=de/e
   puts (input**d)% $pubkey
+  puts "d"
   puts d
 end
 
 rsa_private_keygen()
 rsa_pub_keygen()
-mesg=to_rsa(8,$pubkey,7)
+mesg=to_rsa(65,$pubkey,17)
 puts "mesg"
 puts mesg
 puts "From_rsa"
-from_rsa(mesg,61,53,7)
+from_rsa(mesg,$privatekey[0], $privatekey[1] ,17)
 puts "keys"
 puts $privatekey
 puts $pubkey
+puts "*********"
   #This section hopes to compute pi however much I wish
   #a resource I could look at is http://rubyquiz.strd6.com/quizzes/202-digits-of-pi
   #pi= (4.0/(8*k+1)-2.0/(8*k+4)-1.0/(8*k+5)-1.0/(8*k+6)) / (16**k)
