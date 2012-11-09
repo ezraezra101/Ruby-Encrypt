@@ -1,73 +1,109 @@
 #!/usr/bin/env ruby
-def encode(input='split test', to_code=true, seed=0)
-  #input='split test'
-  #seed = 0
-  source = 3.1415926535897932384626433
-  #to_code=true, false, or 13
+def rotate_13(input="hello world")
   decode= ''
   ascii=[]
 
-  #This picks whether you're doing or undoing code
-  case to_code
-  when false
-      to_code_coefficient= -1
-  when true
-      to_code_coefficient = 1
-  else
-      to_code_coefficient=1
-  end
-
-  #Breaks the input string into pieces and converts to ascii
-  splitcode=input.split(%r{\s*})
-
   input.each_byte do |c|
-       ascii << c
+    ascii << c
   end
 
-
-  #Actually converts to encoded ascii and then to text
-  if to_code != 13
-    splitsource =source.to_s.split(%r{\s*}) - ['.']
-    for i in 0..ascii.length-1
-      ascii[i] += to_code_coefficient * splitsource[i+seed].to_i
-      decode << ascii[i].chr
-    end
-    #  if ascii[i]>126
-     #     ascii[i] += -(126-31)
-      #end
-  # Ascii greater than 126 or less than 31 aren't characters
-
-
-   #   if ( ascii[i] >=  65 and ascii[i] <= 65+25 ) or ( ascii[i] >=  97 and ascii[i] <= 97+25 )
-
-
-
-    #  else
-    #      puts 'fail'
-   #   end
-
-  #13 shift
-  else
-    for i in 0..ascii.length-1       
-      if ascii[i]>=65 and ascii[i] <=90
-        ascii[i]+=13
-        if ascii[i]>90
-          ascii[i] += -26
-        end
-      elsif ascii[i]>=97 and ascii[i]<=122
-        ascii[i] +=13
-        if ascii[i]>122
-          ascii[i] += -26
-        end
-      end
-      decode << ascii[i].chr
-    end
+  for i in 0..ascii.length-1       
+     if ascii[i]>=65 and ascii[i] <=90
+       ascii[i]+=13
+       if ascii[i]>90
+         ascii[i] += -26
+       end
+     elsif ascii[i]>=97 and ascii[i]<=122
+       ascii[i] +=13
+       if ascii[i]>122
+         ascii[i] += -26
+       end
+     end
+     decode << ascii[i].chr
   end
   decode
 end
-#puts encode('Hi', true, 0)
 
- #puts decode
+
+def pi_encrypt(input='hello world', to_code=true,seed=0)
+  source = 3.1415926535897932384626433
+  decode= ''
+  ascii=[]
+  #This picks whether you're doing or undoing code
+  case to_code
+    when false
+      to_code_coefficient= -1
+    when true
+      to_code_coefficient = 1
+  end
+
+  input.each_byte do |c|
+    ascii << c
+  end
+
+  splitsource =source.to_s.split(%r{\s*}) - ['.']
+  for i in 0..ascii.length-1
+    ascii[i] += to_code_coefficient * splitsource[i+seed].to_i
+    decode << ascii[i].chr
+  end
+  decode
+end
+
+
+class RSA_encrypt
+  def make(e)
+    primes=primegen()
+    $n, $d = self.keygen(e,primes)
+    $e=e
+  end
+
+  def primegen()
+    primes = [61,53]
+    #primes = [11,13]
+    primes
+  end
+
+  def keygen(e,primes)
+    n=1
+    totient=1
+    semiarbitrary=15
+
+    for i in 0..primes.length-1
+      n*=primes[i]
+      totient*=primes[i]-1
+    end
+
+    d= (totient*semiarbitrary + 1)/e
+
+    privatekey=[n,d]
+    publickey=[n,e]
+    privatekey
+  end
+
+  def encrypt(input, n, e)
+    output=(input**e)%n
+    output
+  end
+
+  def decrypt(input, n, d)
+    output=(input**d)%n
+    output
+  end
+  def test(mesg=65,e=17)
+    self.make(e)
+    encrypted=self.encrypt(mesg,$n,$e)
+    puts mesg
+    puts "encrypted"
+    puts encrypted
+    puts "decrypted"
+    puts self.decrypt(encrypted,$n,$d)
+    puts "keys"
+    puts $n
+    puts $d
+    puts $e
+    puts "*********"
+  end
+end
 
 #This should take user input
 def run()
@@ -79,6 +115,8 @@ def run()
   case typeofencode
   when 'Y', 'y', 'yes', 'Yes'
     to_code=13
+    puts 'Here is your encrypted text:'
+    puts rotate_13(input)
   else
     puts 'What is your seed? (0 for none)'
     seed=gets.chomp.to_i
@@ -90,9 +128,9 @@ def run()
     else
       to_code=false
     end
+    puts 'Here is your encrypted text:'
+    puts pi_encrypt(input,to_code,seed)
   end
-  puts 'Here is your encrypted text:'
-  puts encode(input,to_code,seed)
   puts 'would you like to encode more? Y/N'
   again=gets.chomp
   case again
@@ -103,122 +141,7 @@ def run()
   end
 end
 
-#Section for RSA encryption:
-#Note: Variables are all named not according to convention
-#This is really insecure. I'm also putting it online . . . Why am I using it for encryption?
-
-#Resources:
-#http://mathcircle.berkeley.edu/BMC3/rsa/node4.html
-#http://www.javamex.com/tutorials/cryptography/rsa_encryption.shtml
-#http://en.wikipedia.org/wiki/RSA_%28algorithm%29#Decryption
-#For the decrypting raising to a power: http://en.wikipedia.org/wiki/Square-and-multiply_algorithm
-#Prime #s: http://www.bigprimes.net/archive/prime/8/
-$pubkey=1
-def rsa_private_keygen()
-#  $privatekey = [61,53]
-  $privatekey = [11,13]
-end
-def rsa_pub_keygen()
-  for i in 0..$privatekey.length-1
-    $pubkey*=$privatekey[i]
-  end
-end
-def to_rsa(input, pubkey, e)
-  output=(input**e)%pubkey
-  output
-end
-
-
-#gcdext and invert are borrowed from https://gist.github.com/2388745
-#Ruby modular arithmatic
-  def gcdext(x, y)
-    if x < 0
-      g, a, b = gcdext(-x, y)
-      return [g, -a, b]
-    end
-    if y < 0
-      g, a, b = gcdext(x, -y)
-      return [g, a, -b]
-    end
-    r0, r1 = x, y
-    a0 = b1 = 1
-    a1 = b0 = 0
-    until r1.zero?
-      q = r0 / r1
-      r0, r1 = r1, r0 - q*r1
-      a0, a1 = a1, a0 - q*a1
-      b0, b1 = b1, b0 - q*b1
-    end
-    [r0, a0, b0]
-  end
-  
-  # Returns the inverse of `num` modulo `mod`.
-  #
-  # @param [Integer] num the number
-  # @param [Integer] mod the modulus
-  # @return [Integer]
-  # @raise ZeroDivisionError if the inverse of `base` does not exist
-  def invert(num, mod)
-    g, a, b = gcdext(num, mod)
-    unless g == 1
-      raise ZeroDivisionError.new("#{num} has no inverse modulo #{mod}")
-    end
-    a % mod
-  end
-
-
-    
-
-
-
-def from_rsa(input,p,q, e)
-  #(e*d=1 )% ((p-1)*(q-1))
-
-  #Notworking example of finding d
-
-  #e*d = 1 (mod totient)
-  #if e==3 and totient==11
-  # 3*d= 1 (mod 11)
-  #Since 3*4 == 12 (mod 11) ==1
-  # d can equal 4
-  #http://en.wikipedia.org/wiki/Modular_multiplicative_inverse
-
-
-  i=15
-  #(p-1)*(q-1) is called Euler's totient function, it gives the n69umber of integers that are coprime (share no factors) of a positive number
-  #de=i*((p-1)*(q-1))+1
-  totient=(p-1)*(q-1)
-  #doesn't work: d**(totient-1)=d**-1    (mod pq)
-  #d=(1/e)%totient
-  d= (totient*i + 1)/e
-  #d=invert(e,totient)
-  #d=de/e
-  puts (input**d)% $pubkey
-  puts "d"
-  puts d
-end
-
-rsa_private_keygen()
-rsa_pub_keygen()
-mesg=to_rsa(65,$pubkey,17)
-puts "mesg"
-puts mesg
-puts "From_rsa"
-from_rsa(mesg,$privatekey[0], $privatekey[1] ,17)
-puts "keys"
-puts $privatekey
-puts $pubkey
-puts "*********"
-  #This section hopes to compute pi however much I wish
-  #a resource I could look at is http://rubyquiz.strd6.com/quizzes/202-digits-of-pi
-  #pi= (4.0/(8*k+1)-2.0/(8*k+4)-1.0/(8*k+5)-1.0/(8*k+6)) / (16**k)
-
-  #Pi = SUMk=0 to infinity 16-k [ 4/(8k+1) - 2/(8k+4) - 1/(8k+5) - 1/(8k+6) ].
-  #ruby info:
-  #http://www.ruby-lang.org/en/libraries/
-
-
- # run()
+run()
 
 
 
