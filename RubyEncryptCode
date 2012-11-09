@@ -2,24 +2,26 @@
 def rotate_13(input="hello world")
   decode= ''
   ascii=[]
-
+  #converts to ascii
   input.each_byte do |c|
     ascii << c
   end
 
-  for i in 0..ascii.length-1       
-     if ascii[i]>=65 and ascii[i] <=90
-       ascii[i]+=13
-       if ascii[i]>90
-         ascii[i] += -26
-       end
-     elsif ascii[i]>=97 and ascii[i]<=122
-       ascii[i] +=13
-       if ascii[i]>122
-         ascii[i] += -26
-       end
-     end
-     decode << ascii[i].chr
+  for i in 0..ascii.length-1
+    #Capital Letters
+    if ascii[i]>=65 and ascii[i] <=90
+      ascii[i]+=13
+      if ascii[i]>90
+        ascii[i] += -26
+      end
+    #lower case letters
+    elsif ascii[i]>=97 and ascii[i]<=122
+      ascii[i] +=13
+      if ascii[i]>122
+        ascii[i] += -26
+      end
+    end
+    decode << ascii[i].chr
   end
   decode
 end
@@ -36,11 +38,12 @@ def pi_encrypt(input='hello world', to_code=true,seed=0)
     when true
       to_code_coefficient = 1
   end
-
+  #converts to ascii
   input.each_byte do |c|
     ascii << c
   end
 
+  #Encodes/decodes and converts back to text
   splitsource =source.to_s.split(%r{\s*}) - ['.']
   for i in 0..ascii.length-1
     ascii[i] += to_code_coefficient * splitsource[i+seed].to_i

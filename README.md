@@ -35,3 +35,22 @@ Notes:
 
   #Breaks the input string into pieces and converts to ascii
   splitcode=input.split(%r{\s*})
+
+
+
+
+
+#Code that removes ascii that isn't letters:
+      #  if ascii[i]>126
+     #     ascii[i] += -(126-31)
+      #end
+  # Ascii greater than 126 or less than 31 aren't characters
+
+
+   #   if ( ascii[i] >=  65 and ascii[i] <= 65+25 ) or ( ascii[i] >=  97 and ascii[i] <= 97+25 )
+
+
+
+    #  else
+    #      puts 'fail'
+   #   end
