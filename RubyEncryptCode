@@ -61,7 +61,7 @@ class RSA_encrypt
   end
 
   def primegen()
-    primes = [61,53]
+    primes = [61,53,23]
     #primes = [11,13]
     primes
   end
@@ -69,14 +69,17 @@ class RSA_encrypt
   def keygen(e,primes)
     n=1
     totient=1
-    semiarbitrary=15
+    #semiarbitrary=15 #15 is the only value that works for primes=[61,53]
 
     for i in 0..primes.length-1
       n*=primes[i]
       totient*=primes[i]-1
     end
-
-    d= (totient*semiarbitrary + 1)/e
+    i=0
+    while (i*totient+1)%e != 0
+      i+=1
+    end
+    d= (totient*i + 1)/e
 
     privatekey=[n,d]
     publickey=[n,e]
@@ -106,6 +109,56 @@ class RSA_encrypt
     puts $e
     puts "*********"
   end
+end
+
+def shrink_mesg_1(mesg)
+  ascii=[]
+  shrinked=0
+  #converts to ascii
+  mesg.each_byte do |c|
+    ascii << c
+  end
+  #converts ascii into a integer, basically it concatinates what ascii is in base 128
+  length=ascii.length
+  for i in 1..length
+    shrinked+=ascii[length-i]*128**(i-1)
+  end
+  shrinked
+end
+
+def shrink_message(mesg)
+  ascii=[]
+  shrinked=''
+  #converts to ascii
+  mesg.each_byte do |c|
+    ascii << c
+  end
+  for i in 0..ascii.length-1
+    byte_letter = ascii[i].to_s(2)
+    if byte_letter.length < 7
+      for x in 1..7-byte_letter.length
+        byte_letter='0'+byte_letter
+      end
+    end
+    shrinked << byte_letter
+
+    #shrinked+=ascii[i]*128**(i)
+  end
+  shrinked.to_i(2)
+end
+
+def unshrink(mesg)
+  decode=''
+  ascii=[]
+  mesg=mesg.to_s(2)
+  for i in 0..mesg.length/7-1
+    ascii << mesg[i*7,7].to_i(2)
+    decode << ascii[i].chr
+    #ascii[i]=mesg % (128**i)
+    #mesg=(mesg-ascii[i])/128
+    #decode << ascii[i].chr
+  end
+  decode
 end
 
 #This should take user input
@@ -144,6 +197,30 @@ def run()
   end
 end
 
+def RSA_runtest()
+  STDOUT.flush
+  rsa=RSA_encrypt.new()
+  rsa.make(17)
+  puts "Input Message"
+  mesg=gets.chomp
+  mesg_int=shrink_message(mesg)
+  encrypted=rsa.encrypt(mesg_int,$n,$e)
+  puts "encrypted"
+  puts encrypted
+  decrypted=rsa.decrypt(encrypted,$n,$d)
+  puts "Decrypted integer"
+  puts decrypted
+  puts "Decrypted message"
+  puts unshrink(decrypted)
+  puts "again? Y/N"
+  again=gets.chomp
+  if again=="Y" or "y" or "Yes" or "yes"
+    RSA_runtest()
+  end
+end
+
+
+RSA_runtest()
 run()
 
 
