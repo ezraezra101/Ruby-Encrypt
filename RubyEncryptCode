@@ -32,7 +32,7 @@ def pi_encrypt(input='hello world', to_code=true,seed=0)
   source = 3.1415926535897932384626433
   decode= ''
   ascii=[]
-  #This picks whether you're doing or undoing code
+  #This picks whether you are doing or undoing code
   case to_code
     when false
       to_code_coefficient= -1
@@ -75,7 +75,7 @@ class RSA_encrypt
     totient=1
     d_set=[]
 
-    #Failsafe: if the totient isn't coprime with e, stuff breaks
+    #Failsafe: if the totient is not coprime with e, stuff breaks
     for i in 0..primes.length-1
       if (primes[i]-1)%e==0
         puts "Change the prime #{primes[i]} or e \(#{e}\)"
@@ -102,7 +102,7 @@ class RSA_encrypt
       d_set[i]=d% (primes[i]-1)
     end
 
-      #computing q's inverse modulus p - only 2 primes at the moment
+      #computing the inverse modulus of q & p only 2 primes at the moment
     #i=0
     #while (i*primes[0]+1)%primes[1] != 0
     #  i+=1
@@ -214,7 +214,7 @@ def shrink_mesg_1(mesg)
 end
 
 def unshrink_mesg_1(mesg)
-  #doesn't unshrink properly when the first character is less than 64ish
+  #does not unshrink properly when the first character is less than 64ish
   decode=''
   ascii=[]
   mesg=mesg.to_s(2)
