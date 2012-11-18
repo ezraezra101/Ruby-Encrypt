@@ -192,7 +192,7 @@ def shrink_message(mesg)
 end
 
 def shrink_mesg_1(mesg)
-  #doesn't work properly
+  #does not work properly
   ascii=[]
   shrinked=''
   #converts to ascii
