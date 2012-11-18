@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+
 def rotate_13(input="hello world")
   decode= ''
   ascii=[]
@@ -56,12 +57,15 @@ end
 class RSA_encrypt
   def make(e)
     primes=primegen()
-    $n, $d = self.keygen(e,primes)
-    $e=e
+    keys=self.keygen(e,primes)
+    $n, $e= keys[1]
+    $privatekey=keys[0]
   end
 
   def primegen()
-    primes = [61,53,23]
+    #primes = [43,257,61,167]
+    primes = [4801,1031,1999,167, 7919, 7643, 2017]
+    #primes = [61,53,23]
     #primes = [11,13]
     primes
   end
@@ -69,21 +73,57 @@ class RSA_encrypt
   def keygen(e,primes)
     n=1
     totient=1
-    #semiarbitrary=15 #15 is the only value that works for primes=[61,53]
+    d_set=[]
+    for i in 0..primes.length-1
+      if (primes[i]-1)%e==0
+        puts "Change the prime #{primes[i]} or e \(#{e}\)"
+        x=1
+      end
+    end
+    if x==1
+      quit
+    end
 
     for i in 0..primes.length-1
       n*=primes[i]
       totient*=primes[i]-1
     end
     i=0
+
     while (i*totient+1)%e != 0
       i+=1
     end
     d= (totient*i + 1)/e
 
-    privatekey=[n,d]
+    #Chinese remainder algorithim keygen
+    for i in 0..primes.length-1
+      d_set[i]=d% (primes[i]-1)
+    end
+
+      #computing q's inverse modulus p - only 2 primes at the moment
+    #i=0
+    #while (i*primes[0]+1)%primes[1] != 0
+    #  i+=1
+    #end
+    #qinv=(i*primes[0] + 1)/primes[1]
+
+    #trying to make work with more primes
+    primesinverse=[]
+    primesproduct=1
+    for i in 0..primes.length-1
+      x=0
+      while (x*primesproduct + 1) % primes[i] != 0
+        x+=1
+      end
+      primesinverse[i]= (x*primesproduct + 1)/primes[i]
+      primesproduct*=primes[i]
+    end
+
+    #privatekey=[n,d] - for when not using the Chinese remainder decryption
+    privatekey=[primesinverse, d_set, primes]
     publickey=[n,e]
-    privatekey
+    output=[privatekey, publickey]
+    output
   end
 
   def encrypt(input, n, e)
@@ -91,8 +131,30 @@ class RSA_encrypt
     output
   end
 
-  def decrypt(input, n, d)
-    output=(input**d)%n
+  #def decrypt(input, n, d)
+  #  output=(input**d)%n
+  #end
+  def decrypt(input,primesinverse,d_set,primes)
+    #Chinese remainder decryption:
+    m=[]
+    for i in 0..primes.length-1
+      m[i]=(input**d_set[i]) % primes[i]
+    end
+    #this part works with only two primes
+    #h=(qinv*(m[0]-m[1]))%primes[0]
+    #output= m[1] + h*primes[1]
+    #fixed to make work with more primes
+    primesproduct=1
+    tempoutput=0
+
+    for i in 0..primes.length-1
+      temph=(primesinverse[i]*(tempoutput-m[i]))%primesproduct
+      tempoutput=m[i] + temph*primes[i]
+      primesproduct*=primes[i]
+    end
+
+    output=tempoutput
+
     output
   end
   def test(mesg=65,e=17)
@@ -102,7 +164,8 @@ class RSA_encrypt
     puts "encrypted"
     puts encrypted
     puts "decrypted"
-    puts self.decrypt(encrypted,$n,$d)
+    #puts self.decrypt(encrypted,$n,$d)
+    puts "This function is broken"
     puts "keys"
     puts $n
     puts $d
@@ -111,7 +174,7 @@ class RSA_encrypt
   end
 end
 
-def shrink_mesg_1(mesg)
+def shrink_message(mesg)
   ascii=[]
   shrinked=0
   #converts to ascii
@@ -126,7 +189,8 @@ def shrink_mesg_1(mesg)
   shrinked
 end
 
-def shrink_message(mesg)
+def shrink_mesg_1(mesg)
+  #doesn't work properly
   ascii=[]
   shrinked=''
   #converts to ascii
@@ -201,21 +265,32 @@ def RSA_runtest()
   STDOUT.flush
   rsa=RSA_encrypt.new()
   rsa.make(17)
+
+  i=0
+  while 128**i<=$n
+    i+=1
+  end
+  puts "This encryption can only take about #{i-1} characters"
+
   puts "Input Message"
   mesg=gets.chomp
   mesg_int=shrink_message(mesg)
   encrypted=rsa.encrypt(mesg_int,$n,$e)
   puts "encrypted"
   puts encrypted
-  decrypted=rsa.decrypt(encrypted,$n,$d)
+  #decrypted=rsa.decrypt(encrypted,$n,$d)
+  decrypted=rsa.decrypt(encrypted,$privatekey[0],$privatekey[1],$privatekey[2])
   puts "Decrypted integer"
   puts decrypted
   puts "Decrypted message"
   puts unshrink(decrypted)
   puts "again? Y/N"
   again=gets.chomp
-  if again=="Y" or "y" or "Yes" or "yes"
+  case again
+  when 'Y', 'y', 'yes', 'Yes'
     RSA_runtest()
+  else
+    puts 'Bye'
   end
 end
 
@@ -225,14 +300,5 @@ run()
 
 
 
-#Will's gui code:
-Shoes.app :width=>400, :height=>340 do
-  flow do
-    @e=edit_line
-    button "Go!" do
-      @abc.text = encode(@e.text,13)
-    end
-    @abc=edit_line
-  end
-end
-
+#For Hacking:
+#decrypt(2790,[1,38],[53,49],[61,53])
