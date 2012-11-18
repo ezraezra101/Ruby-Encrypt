@@ -74,6 +74,8 @@ class RSA_encrypt
     n=1
     totient=1
     d_set=[]
+
+    #Failsafe: if the totient isn't coprime with e, stuff breaks
     for i in 0..primes.length-1
       if (primes[i]-1)%e==0
         puts "Change the prime #{primes[i]} or e \(#{e}\)"
@@ -211,7 +213,8 @@ def shrink_mesg_1(mesg)
   shrinked.to_i(2)
 end
 
-def unshrink(mesg)
+def unshrink_mesg_1(mesg)
+  #doesn't unshrink properly when the first character is less than 64ish
   decode=''
   ascii=[]
   mesg=mesg.to_s(2)
@@ -224,6 +227,25 @@ def unshrink(mesg)
   end
   decode
 end
+
+def unshrink(mesg)
+  decode=''
+  ascii=[]
+
+  length=1
+  while 128**length<=mesg
+    length+=1
+  end
+
+  for i in 1..length
+    ascii << mesg/(128**(length-i))
+    mesg=mesg % (128**(length-i))
+    decode << ascii[i-1].chr
+  end
+
+  decode
+end
+
 
 #This should take user input
 def run()
