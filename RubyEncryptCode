@@ -60,13 +60,14 @@ class RSA_encrypt
     keys=self.keygen(e,primes)
     $n, $e= keys[1]
     $privatekey=keys[0]
+    keysave(keys)
   end
 
   def primegen()
     #primes = [43,257,61,167]
-    primes = [4801,1031,1999,167, 7919, 7643, 2017]
+    #primes = [4801,1031,1999,167, 7919, 7643, 2017]
     #primes = [61,53,23]
-    #primes = [11,13]
+    primes = [11,13]
     primes
   end
 
@@ -109,7 +110,7 @@ class RSA_encrypt
     #end
     #qinv=(i*primes[0] + 1)/primes[1]
 
-    #trying to make work with more primes
+    #made to work with more primes
     primesinverse=[]
     primesproduct=1
     for i in 0..primes.length-1
@@ -316,11 +317,61 @@ def RSA_runtest()
   end
 end
 
+def keysave(keys)
+  n, e= keys[1]
+  privatekey=keys[0]
+  puts "n, e"
+  puts n, '\n', e
+  puts 'privatekey'
+  puts 'primesinverse'
+  puts privatekey[0]
+  puts 'd_set'
+  puts privatekey[1]
+  puts 'primes'
+  puts privatekey[2]
+
+  private_key_file = File.new("rsa_private_key.txt", "w")
+  #Bad: concatinates substrings
+  #string='type=privatekey' "\n" "n="+n.to_s() +"\n" + "e="+e.to_s() +"\n" + "primesinverses="+privatekey[0].to_s() +"\n" + 'd_set='+privatekey[1].to_s() +"\n" + 'primes='+privatekey[2].to_s()
+
+  private_key_names=["primesinverses","d_set", "primes"]
+  private_key_string=""
+  for i in 0..privatekey.length-1
+    private_key_string << private_key_names[i]+"=["+privatekey[i][0].to_s
+    for x in 1..privatekey[0].length-1
+      private_key_string << ","+privatekey[0][x].to_s
+    end
+    private_key_string << "]\n"
+  end
+  puts private_key_string
+
+
+=begin
+  private_key_file.write(string)
+  puts 'string', string
+  #private_key_file.write('test')
+  private_key_file.close
+
+  myStr = "This is a test"
+aFile = File.new("myString.txt", "w")
+#<File:myString.txt>
+aFile.write(myStr)
+aFile.close
+
+  #public_key_file = File.new("rsa_public_key.txt")
+=end
+end
+=begin
+myStr = "This is a test"
+aFile = File.new("myString.txt", "w")
+#<File:myString.txt>
+aFile.write(myStr)
+aFile.close
+aFile=File.open("myString.txt", "w")
+=end
 
 RSA_runtest()
 run()
-
-
 
 #For Hacking:
 #decrypt(2790,[1,38],[53,49],[61,53])
