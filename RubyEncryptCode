@@ -65,9 +65,9 @@ class RSA_encrypt
 
   def primegen()
     #primes = [43,257,61,167]
-    #primes = [4801,1031,1999,167, 7919, 7643, 2017]
+    primes = [4801,1031,1999,167, 7919, 7643, 2017]
     #primes = [61,53,23]
-    primes = [11,13]
+    #primes = [11,13]
     primes
   end
 
@@ -167,8 +167,8 @@ class RSA_encrypt
     puts "encrypted"
     puts encrypted
     puts "decrypted"
-    #puts self.decrypt(encrypted,$n,$d)
-    puts "This function is broken"
+    puts self.decrypt(encrypted,$privatekey[0],$privatekey[1],$privatekey[2])
+    #puts "This function is broken"
     puts "keys"
     puts $n
     puts $d
@@ -194,7 +194,7 @@ class RSA_encrypt
 
     private_key_file = File.new("rsa_private_key.rb", "w")
 
-    private_key_file.write("def privatekey()\n"+self.private_key_string(privatekey)+"\nend\ndef publickey()\n"+self.public_key_string(publickey)+"end")
+    private_key_file.write("def privatekey()\n"+self.private_key_string(privatekey)+"\nend\ndef publickey()\n"+self.public_key_string(publickey)+"\nend")
 
     #private_key_file.close
 
@@ -212,9 +212,9 @@ class RSA_encrypt
     private_key_names=["primesinverses","d_set", "primes"]
     private_key_string="privatekey=["
     for i in 0..privatekey.length-1
-      private_key_string << private_key_names[i]+"=["+privatekey[i][0].to_s
-      for x in 1..privatekey[0].length-1
-        private_key_string << ","+privatekey[0][x].to_s
+      private_key_string << private_key_names[i]+"=["
+      for x in 0..privatekey[i].length-1
+        private_key_string << privatekey[i][x].to_s+","
       end
       private_key_string << "],\n"
     end
@@ -302,6 +302,7 @@ def rsa_keyload(key_file_path="rsa_private_key.rb")
   load key_file_path
   $n, $e= publickey
   $privatekey=privatekey
+  puts $n, $e, $privatekey
 
 end
 
@@ -345,8 +346,15 @@ end
 def RSA_runtest()
   STDOUT.flush
   rsa=RSA_encrypt.new()
-  rsa.make(17)
-  #rsa_keyload()
+  puts "Load keys? Y/N"
+  load=gets.chomp
+  case load
+  when 'Y', 'y', 'yes', 'Yes'
+    rsa_keyload()
+  else
+    rsa.make(17)
+  end
+  
 
   i=0
   while 128**i<=$n

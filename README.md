@@ -7,6 +7,22 @@ I am currently trying to add RSA style encryption.
 
 
 
+Things to do:
+-break up input string, encrypt, then concatinate
+-separate decryption/encryption for RSA
+-Add the option to save multiple (and different types) of keys - run from keyfile?
+-Allow the user to input their own prime #s (or randomly generate them)
+-Automate testing
+-Move away from global variables (to object specific variables)
+-Longer source for pi encrypt (separate file?)
+
+
+
+
+
+
+
+
 
 Notes:
 
