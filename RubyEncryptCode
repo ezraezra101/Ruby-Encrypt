@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-
 def rotate_13(input="hello world")
   decode= ''
   ascii=[]
@@ -196,7 +195,7 @@ class RSA_encrypt
 
     private_key_file.write("def privatekey()\n"+self.private_key_string(privatekey)+"\nend\ndef publickey()\n"+self.public_key_string(publickey)+"\nend")
 
-    #private_key_file.close
+    private_key_file.close
 
     #public_key_file = File.new("rsa_public_key.txt")
   end
@@ -225,7 +224,46 @@ class RSA_encrypt
     n, e= publickey
     public_key_string="publickey=[n="+n.to_s+",e="+e.to_s+"]"
   end
+
+
+
+  def split_input(input)
+    max_l=self.max_length($n)
+    split_input=[]
+    for i in 0..(input.length()/max_l)
+      split_input << input[max_l*i,max_l*(i+1)]
+    end
+    split_input
+  end
+
+
+  def max_length(n=$n)
+    #returns the number of bytes encrypted in a single run
+    i=0
+    while 128**i<=n
+      i+=1
+    end
+    max_length=i-1
+  end
+
+  def encrypt_splits(input,n=$n,e=$e)
+    split=self.split_input(input)
+    encrypted=[]
+    for i in 0..split.length-1
+      encrypted << self.encrypt(split[i],n,e)
+    end
+    encrypted
+  end
+  def decrypt_splits(input,primesinverse=$privatekey[0],d_set=$privatekey[1],primes=$privatekey[2])
+    decrypted=''
+    for i in 0..input.length-1
+      decrypted << self.decrypt(input[i],primesinverse,d_set,primes)
+    end
+    decrypted
+  end
+
 end
+
 
 def shrink_message(mesg)
   ascii=[]
@@ -306,7 +344,6 @@ def rsa_keyload(key_file_path="rsa_private_key.rb")
 
 end
 
-
 #This should take user input
 def run()
   STDOUT.flush
@@ -356,20 +393,19 @@ def RSA_runtest()
   end
   
 
-  i=0
-  while 128**i<=$n
-    i+=1
-  end
-  puts "This encryption can only take about #{i-1} characters"
+  max_length=rsa.max_length($n)
+  puts "This encryption can only take about #{max_length} characters"
 
   puts "Input Message"
   mesg=gets.chomp
   mesg_int=shrink_message(mesg)
   encrypted=rsa.encrypt(mesg_int,$n,$e)
+  #encrypted=rsa.encrypt_splits(mesg_int,$n,$e)
   puts "encrypted"
   puts encrypted
   #decrypted=rsa.decrypt(encrypted,$n,$d)
   decrypted=rsa.decrypt(encrypted,$privatekey[0],$privatekey[1],$privatekey[2])
+  #decrypted=rsa.decrypt_splits(encrypted,$privatekey[0],$privatekey[1],$privatekey[2])
   puts "Decrypted integer"
   puts decrypted
   puts "Decrypted message"
@@ -384,7 +420,54 @@ def RSA_runtest()
   end
 end
 
-RSA_runtest()
+
+def rsa_autotest(mesg="hello world",load=false)
+  rsa=RSA_encrypt.new()
+  puts "Load keys? Y/N"
+  case load
+  when true
+    rsa_keyload()
+    puts "keyloaded"
+    again=false
+  else
+    rsa.make(17)
+    again=true
+  end
+  
+
+  max_length=rsa.max_length($n)
+  puts "This encryption can only take about #{max_length} characters"
+
+  puts "Input Message"
+  puts mesg
+  mesg_int=shrink_message(mesg)
+  puts "shrunk mesg\t"+ mesg_int.to_s
+  encrypted=rsa.encrypt(mesg_int,$n,$e)
+  #encrypted=rsa.encrypt_splits(mesg_int,$n,$e)
+  puts "encrypted\t"+encrypted.to_s
+
+
+  decrypted=rsa.decrypt(encrypted,$privatekey[0],$privatekey[1],$privatekey[2])
+  #decrypted=rsa.decrypt_splits(encrypted,$privatekey[0],$privatekey[1],$privatekey[2])
+  puts "Decrypted integer"
+  puts decrypted
+  puts "Decrypted message"
+  puts unshrink(decrypted)
+  if unshrink(decrypted) != mesg
+    puts 'The decryption is different from the encryption'
+  end
+
+  case again
+  when true
+    rsa_autotest(mesg,true)
+  else
+    puts 'Bye'
+  end
+end
+
+rsa_autotest()
+
+#RSA_runtest()
 #run()
 
 #For Hacking:
