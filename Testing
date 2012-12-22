@@ -1,0 +1,82 @@
+#!/usr/bin/env ruby
+
+class String
+  # colorization
+  # borrowed from http://stackoverflow.com/questions/1489183/colorized-ruby-output
+  def colorize(color_code)
+    "\e[#{color_code}m#{self}\e[0m"
+  end
+
+  def red
+    colorize(91) #or 31
+  end
+
+  def green
+    colorize(32)
+  end
+
+  def yellow
+    colorize(33)
+  end
+
+  def pink
+    colorize(35)
+  end
+end
+
+def test()
+  begin
+    raise "specialerror"
+  rescue RuntimeError, "specialerror"
+    puts "error".red
+  end
+end
+def test0()
+  raise RuntimeError, "specialerror", caller
+end
+def test2()
+  catch ("Testing") do
+    $x="Thrown?".green
+    throw "Testing"
+    $x="NoThrow".red
+  end
+  puts $x
+end
+#test()
+#test2()
+
+
+class Testin
+  @@atat="atat str"
+  @at="at str"
+  def atat()
+    @@atat
+  end
+  def at()
+    @at
+  end
+  def setat(new_at)
+    @at=new_at
+  end
+  def setatat(new_atat)
+    @@atat=new_atat
+  end
+end
+def testin_class()
+  class_test=Testin.new()
+  class_test.setat("test0 setting at")
+  class_test1=Testin.new()
+
+  class_test1.setat("test1 setting at")
+  puts class_test.at
+
+  class_test.setatat("test1 setting atat")
+  puts class_test.atat
+end
+testin_class()
+#=>test0 setting at
+#=>test1 setting atat
+
+
+
+
