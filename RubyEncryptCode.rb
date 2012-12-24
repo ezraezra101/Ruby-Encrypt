@@ -1,35 +1,13 @@
 #!/usr/bin/env ruby
 
-class String
-  # colorization
-  # borrowed from http://stackoverflow.com/questions/1489183/colorized-ruby-output
-  def colorize(color_code)
-    "\e[#{color_code}m#{self}\e[0m"
-  end
-
-  def red
-    colorize(91) #or 31
-  end
-
-  def green
-    colorize(32)
-  end
-
-  def yellow
-    colorize(33)
-  end
-
-  def pink
-    colorize(35)
-  end
-
-  def grey
-    colorize(37)
+unless Kernel.respond_to?(:require_relative)
+  #borrowed from: http://stackoverflow.com/questions/4333286/ruby-require-vs-require-relative-best-practice-to-workaround-running-in-both
+  module Kernel
+    def require_relative(path)
+      require File.join(File.dirname(caller[0]), path.to_str)
+    end
   end
 end
-
-
-
 
 def rotate_13(input="hello world")
   decode= ''
@@ -223,7 +201,7 @@ class RSA_encrypt
     puts privatekey[2]
 =end
 
-    private_key_file = File.new("rsa_private_key.rb", "w")
+    private_key_file = File.new(File.dirname(caller[0])+"/"+"rsa_private_key.rb", "w")
 
     private_key_file.write("def privatekey()\n"+self.private_key_string(privatekey)+"\nend\ndef publickey()\n"+self.public_key_string(publickey)+"\nend")
 
@@ -374,7 +352,7 @@ end
 
 def rsa_keyload(key_file_path="rsa_private_key.rb")
   #require key_file_path
-  load key_file_path
+  require_relative key_file_path
   $n, $e= publickey
   $privatekey=privatekey
   #puts $n, $e, $privatekey
@@ -459,200 +437,6 @@ def RSA_runtest()
     puts 'Bye'
   end
 end
-
-
-def test()
-  begin
-    raise "specialerror"
-  rescue RuntimeError, "specialerror"
-    puts "error".red
-  rescue
-    puts "Other Error"
-  end
-end
-
-class RSA_test
-  def intialize_rsa(rsa_name="rsa")
-    @rsa_name=rsa_name
-    @rsa_name=RSA_encrypt.new()
-  end
-  def rsa_name()
-    @rsa_name
-  end
-
-  def keynil?()
-    begin
-      raise RuntimeError, "Keys_are_nil" if $n.nil? or $e.nil? or $privatekey.nil?
-    rescue RuntimeError, "Keys_are_nil"
-      puts "Encryption Keys are nil".red
-      puts "$n="+$n.to_s
-      puts "$e="+$e.to_s
-      puts "privatekey jumble="+$privatekey
-      true
-    end
-  end
-
-  def keyclear()
-    $n,$e,$privatekey=nil,nil,nil
-  end
-
-  def keyload(key_file_path="rsa_private_key.rb")
-    begin
-      rsa_keyload(key_file_path)
-    rescue
-      puts "error in loading".red
-    else
-      puts "Loaded keys".green
-    ensure
-      self.keynil?()
-    end
-  end
-
-  def make(e=17)
-    begin
-      @rsa_name.make(e)
-    rescue
-      puts "error in making keys".red
-    else
-      puts "Made key".green
-      #should add more?
-    ensure
-      self.keynil?()
-    end
-  end
-
-  def shrinking(mesg=" Hello World ~|\"")
-    begin
-      shrunk = shrink_message(mesg)
-      unshrunk = unshrink(shrunk)
-      raise RuntimeError, "Shrinking unequal" if unshrunk!=mesg
-    rescue RuntimeError, "Shrinking unequal"
-      puts "Shrinking of message not working properly".red
-      puts "Original message:#{mesg}\t".red
-      puts "Unshrunk message:#{unshrunk}\t".red
-    rescue
-      puts "error in shrinking".red
-    else
-      puts "Shrinking working".green
-    end
-  end
-
-  def encryption(mesg=" Hello World ~|\"")
-    to_be_printed="\tInput Message:\t#{mesg}\n"
-    begin
-      max_length=@rsa_name.max_length($n)
-    rescue
-      puts "error in determining the number of characters encrypted at a time".red
-    else
-      to_be_printed << "\tThis encryption encrypts #{max_length} characters at a time\n"
-      print ".".green
-      $stdout.flush
-    end
-  
-    #mesg_int=shrink_message(mesg)
-    #puts "shrunk mesg\t"+ mesg_int.to_s
-    #encrypted=rsa.encrypt(mesg_int,$n,$e)
-    #encrypted=rsa.encrypt_splits(mesg_int,$n,$e)
-
-    begin
-      begin
-        encrypted=@rsa_name.encrypt_splits(mesg,$n,$e)
-      rescue
-        puts "error in encryption".red
-      else
-        to_be_printed << "\tencrypted text:\t#{encrypted.to_s}\n"
-        print ".".green
-        $stdout.flush
-      end
-
-      begin
-        decrypted=@rsa_name.decrypt_splits(encrypted,$privatekey[0],$privatekey[1],$privatekey[2])
-      rescue
-        puts "error in decryption".red
-      else
-        to_be_printed << "\tDecryption: #{decrypted}\n"
-        print ".\n".green
-        $stdout.flush
-      end
-
-      raise RuntimeError, "Decryption unequal" if decrypted!=mesg
-
-    rescue RuntimeError, "Decryption unequal"
-      puts "Decryption does not equal the input".red
-    rescue
-      puts "problem in encyption/decryption"
-    else
-      puts "Decryption equals encryption".green
-    ensure
-      puts to_be_printed.grey
-    end
-
-  end
-end
-
-def rsa_autotest(mesg="hello world test",load=false)
-  rsatest=RSA_test.new()
-  rsatest.intialize_rsa("rsa")
-  rsatest.make()
-  rsatest.keyclear()
-  rsatest.keyload()
-  rsatest.shrinking(mesg)
-  rsatest.encryption(mesg)
-
-  rsa=rsatest.rsa_name()
-
-=begin
-  puts "Load keys? Y/N"
-  case load
-  when true
-    rsa_keyload()
-    puts "keyloaded"
-    again=false
-  else
-    rsa.make(17)
-    again=true
-  end
-
-  begin
-    rsa_keyload()
-    raise RuntimeError, "Keys_are_nil" if $n.nil? or $e.nil? or $privatekey.nil?
-  rescue RuntimeError, "Keys_are_nil"
-    puts "Keys are nil".red
-    puts "$n="+$n.to_s
-    puts "$e="+$e.to_s
-    puts "privatekey jumble="+$privatekey
-  rescue
-    puts "error in loading".red
-  else
-    puts "Loaded keys".green
-  end
-
-  max_length=rsa.max_length($n)
-  puts "This encryption can only take about #{max_length} characters"
-
-  puts "Input Message"
-  puts mesg
-  #mesg_int=shrink_message(mesg)
-  #puts "shrunk mesg\t"+ mesg_int.to_s
-  #encrypted=rsa.encrypt(mesg_int,$n,$e)
-  #encrypted=rsa.encrypt_splits(mesg_int,$n,$e)
-  encrypted=rsa.encrypt_splits(mesg,$n,$e)
-  puts "encrypted\t"+encrypted.to_s
-
-
-  decrypted=rsa.decrypt_splits(encrypted,$privatekey[0],$privatekey[1],$privatekey[2])
-  #decrypted=rsa.decrypt_splits(encrypted,$privatekey[0],$privatekey[1],$privatekey[2])
-  puts "Decrypted integer"
-  puts decrypted
-  #puts "Decrypted message"
-  #puts unshrink(decrypted)
-  if decrypted != mesg
-    puts 'The decryption is different from the encryption'.red
-  end
-=end
-end
-
-rsa_autotest(" Hello W0rld TEST\\")
 
 #RSA_runtest()
 #run()
