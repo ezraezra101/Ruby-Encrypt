@@ -396,24 +396,27 @@ def run()
   end
 end
 
-def RSA_runtest()
+def RSA_run(load=true,mesg="hello world")
   STDOUT.flush
   rsa=RSA_encrypt.new()
-  puts "Load keys? Y/N"
-  load=gets.chomp
+
   case load
-  when 'Y', 'y', 'yes', 'Yes'
+  when true
     rsa_keyload()
   else
     rsa.make(17)
   end
   
 
+
   max_length=rsa.max_length($n)
   puts "This encryption can only take about #{max_length} characters"
 
-  puts "Input Message"
-  mesg=gets.chomp
+  encrypted=rsa.encrypt_splits(mesg,$n,$e)
+  puts "Encrypted text:\n"+encrypted.to_s
+  decrypted=rsa.decrypt_splits(encrypted,$privatekey[0],$privatekey[1],$privatekey[2])
+  puts "Decrypted text:\n"+decrypted
+=begin
   mesg_int=shrink_message(mesg)
   puts "broken"
   encrypted=rsa.encrypt(mesg_int,$n,$e)
@@ -428,18 +431,38 @@ def RSA_runtest()
   puts decrypted
   puts "Decrypted message"
   puts unshrink(decrypted)
+=end
+
+end
+
+def RSA_ask()
+  puts "Load keys? Y/N"
+  loadq=gets.chomp
+  case loadq
+  when 'Y', 'y', 'yes', 'Yes'
+    load=true
+  else
+    load=false
+  end
+
+  puts "Input Message"
+  mesg=gets.chomp
+
+  RSA_run(load,mesg)
+
   puts "again? Y/N"
   again=gets.chomp
   case again
   when 'Y', 'y', 'yes', 'Yes'
-    RSA_runtest()
+    RSA_ask()
   else
     puts 'Bye'
   end
 end
-
-#RSA_runtest()
-#run()
+if __FILE__==$0
+  RSA_ask()
+  #run()
+end
 
 #For Hacking:
 #decrypt(2790,[1,38],[53,49],[61,53])

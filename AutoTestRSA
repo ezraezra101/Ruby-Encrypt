@@ -48,6 +48,8 @@ def test()
     puts "error".red
   rescue
     puts "Other Error"
+  else
+    puts "success".green
   end
 end
 
