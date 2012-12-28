@@ -67,8 +67,8 @@ class RSA_encrypt
   def make(e)
     primes=primegen()
     keys=self.keygen(e,primes)
-    $n, $e= keys[1]
-    $privatekey=keys[0]
+    @n, @e= keys[1]
+    @privatekey=keys[0]
     self.keysave(keys)
   end
 
@@ -138,7 +138,14 @@ class RSA_encrypt
     output
   end
 
-  def encrypt_once(input, n, e)
+  def encrypt_once(input, n=nil, e=nil)
+    if n==nil
+      n=@n
+    end
+    if e==nil
+      e=@e
+    end
+
     output=(input**e)%n
     output
   end
@@ -146,7 +153,10 @@ class RSA_encrypt
   #def decrypt(input, n, d)
   #  output=(input**d)%n
   #end
-  def decrypt_once(input,primesinverse,d_set,primes)
+  def decrypt_once(input,primesinverse=nil,d_set=nil,primes=nil)#primesinverse=@privatekey[0],d_set=@privatekey[1],primes=@privatekey[2])
+    if primesinverse or d_set or primes == nil
+      primesinverse, d_set, primes =@privatekey
+    end
     #Chinese remainder decryption:
     m=[]
     for i in 0..primes.length-1
@@ -169,6 +179,7 @@ class RSA_encrypt
 
     output
   end
+=begin
   def test(mesg=65,e=17)
     self.make(e)
     encrypted=self.encrypt_once(mesg,$n,$e)
@@ -184,9 +195,21 @@ class RSA_encrypt
     puts $e
     puts "*********"
   end
+=end
+
+  def keyload(key_file_path="rsa_private_key.rb")
+    #require key_file_path
+    require_relative key_file_path
+    @n, @e= publickey
+    @privatekey=privatekey
+    #puts $n, $e, $privatekey
+  end
 
 
-  def keysave(keys)
+  def keysave(keys=nil)
+    if keys==nil
+      keys=@privatekey,[@n,@e]
+    end
     publickey= keys[1]
     privatekey=keys[0]
 =begin
@@ -235,9 +258,10 @@ class RSA_encrypt
     public_key_string="publickey=[n="+n.to_s+",e="+e.to_s+"]"
   end
 
-
-
-  def split_input(input,n=$n)
+  def split_input(input,n=nil)
+    if n==nil
+      n=@n
+    end
     max_l=self.max_length(n)
     #puts max_l
     split_input=[]
@@ -248,7 +272,10 @@ class RSA_encrypt
   end
 
 
-  def max_length(n=$n)
+  def max_length(n=nil)
+    if n==nil
+      n=@n
+    end
     #returns the number of bytes encrypted in a single run
     i=0
     while 128**i<=n
@@ -257,7 +284,12 @@ class RSA_encrypt
     max_length=i-1
   end
 
-  def encrypt_splits(input,n=$n,e=$e)
+  def encrypt_splits(input,n=nil,e=nil)
+    if n or e == nil
+      n=@n
+      e=@e
+    end
+
     split=self.split_input(input,n)
     encrypted=[]
     for i in 0..split.length-1
@@ -267,7 +299,11 @@ class RSA_encrypt
     end
     encrypted
   end
-  def decrypt_splits(input,primesinverse=$privatekey[0],d_set=$privatekey[1],primes=$privatekey[2])
+  def decrypt_splits(input,primesinverse=nil,d_set=nil,primes=nil)#primesinverse=@privatekey[0],d_set=@privatekey[1],primes=@privatekey[2])
+    if primesinverse or d_set or primes == nil
+      primesinverse, d_set, primes =@privatekey
+    end
+
     decrypted=''
     for i in 0..input.length-1
       split_int=self.decrypt_once(input[i],primesinverse,d_set,primes)
@@ -275,6 +311,24 @@ class RSA_encrypt
       decrypted << unshrink(split_int)
     end
     decrypted
+  end
+
+  def keysnil?()
+    to_return=""
+    if @n and @e and @privatekey !=nil
+      to_return=false
+    else
+      if @n==nil
+        to_return << "n "
+      end
+      if @e==nil
+        to_return << "e "
+      end
+      if @privatekey==nil
+        to_return << "privatekey "
+      end
+      to_return
+    end
   end
 
 end
@@ -350,16 +404,6 @@ def unshrink(mesg)
   decode
 end
 
-def rsa_keyload(key_file_path="rsa_private_key.rb")
-  #require key_file_path
-  require_relative key_file_path
-  $n, $e= publickey
-  $privatekey=privatekey
-  #puts $n, $e, $privatekey
-
-end
-
-
 #This should take user input
 def run()
   STDOUT.flush
@@ -402,19 +446,19 @@ def RSA_run(load=true,mesg="hello world")
 
   case load
   when true
-    rsa_keyload()
+    rsa.keyload()
   else
     rsa.make(17)
   end
   
 
 
-  max_length=rsa.max_length($n)
+  max_length=rsa.max_length() #auto uses @n
   puts "This encryption can only take about #{max_length} characters"
 
-  encrypted=rsa.encrypt_splits(mesg,$n,$e)
+  encrypted=rsa.encrypt_splits(mesg) #auto includes @n & @e
   puts "Encrypted text:\n"+encrypted.to_s
-  decrypted=rsa.decrypt_splits(encrypted,$privatekey[0],$privatekey[1],$privatekey[2])
+  decrypted=rsa.decrypt_splits(encrypted) #auto includes "@privatekey"<\paraphrase>
   puts "Decrypted text:\n"+decrypted
 =begin
   mesg_int=shrink_message(mesg)

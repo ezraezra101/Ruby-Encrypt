@@ -63,13 +63,13 @@ class RSA_test
   end
 
   def keynil?()
+    #here is a problem
     begin
-      raise RuntimeError, "Keys_are_nil" if $n.nil? or $e.nil? or $privatekey.nil?
+      keynil=@rsa_name.keysnil?()
+
+      raise RuntimeError, "Keys_are_nil" if keynil!=false
     rescue RuntimeError, "Keys_are_nil"
-      puts "Encryption Keys are nil".red
-      puts "$n="+$n.to_s
-      puts "$e="+$e.to_s
-      puts "privatekey jumble="+$privatekey.to_s
+      puts "Encryption Keys are nil: #{keynil}".red
       true
     end
   end
