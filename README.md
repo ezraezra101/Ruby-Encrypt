@@ -11,11 +11,11 @@ Things to do:
 -separate decryption/encryption for RSA
 -Add the option to save multiple (and different types) of keys - run from keyfile?
 -Allow the user to input their own prime #s (or randomly generate them)
--Move away from global variables (to object specific variables)
 -Longer source for pi encrypt (separate file?)
 Done:
 -break up input string, encrypt, then concatinate
 -Automate testing
+-Move away from global variables (to object specific variables)
 
 
 

@@ -330,6 +330,9 @@ class RSA_encrypt
       to_return
     end
   end
+  def keyclear()
+    @n,@e,@privatekey=nil,nil,nil
+  end
 
 end
 

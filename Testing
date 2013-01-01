@@ -104,11 +104,28 @@ def run_testingish()
   puts object.return(@var1).to_s
   puts object.return(3).to_s
 end
-run_testingish()
+#run_testingish()
 #=>3
 #=>
 #=>
 #=>4
 
+
+unless Kernel.respond_to?(:require_relative)
+  #borrowed from: http://stackoverflow.com/questions/4333286/ruby-require-vs-require-relative-best-practice-to-workaround-running-in-both
+  module Kernel
+    def require_relative(path)
+      require File.join(File.dirname(caller[0]), path.to_str)
+    end
+  end
+end
+
+require_relative 'RubyEncryptCode.rb'
+#include("RubyEncryptCode")
+
+rsa=RSA_encrypt.new()
+rsa.make(17)
+rsa.keyclear()
+puts rsa.keysnil?
 
 
