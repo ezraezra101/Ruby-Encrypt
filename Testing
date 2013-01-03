@@ -49,7 +49,7 @@ end
 class Testin
   @@atat="atat str"
   @at="at str"
-  def atat()
+  def atat() #Should have used attr_accessor :atat, :at in initializer (I think)
     @@atat
   end
   def at()
@@ -127,5 +127,17 @@ rsa=RSA_encrypt.new()
 rsa.make(17)
 rsa.keyclear()
 puts rsa.keysnil?
+
+
+
+
+def recursive()
+  def recursive()
+    puts "hi"
+  end
+end
+recursive()
+print "Ran recursive once\n"
+recursive()
 
 

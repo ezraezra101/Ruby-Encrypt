@@ -257,6 +257,21 @@ class RSA_encrypt
     n, e= publickey
     public_key_string="publickey=[n="+n.to_s+",e="+e.to_s+"]"
   end
+  def encrypted_string(encrypted_array) #bad Should be changed
+    string="["
+    for i in 0..encrypted_array.length-1
+      string << encrypted_array[i].to_s+","
+    end
+    string << "]"
+    string
+  end
+  def encrypted_array(encrypted_string)
+    array=[]
+    for i in 0..encrypted_string.length-1
+      array << encrypted_string[i].to_i
+    end
+    array
+  end
 
   def split_input(input,n=nil)
     if n==nil
@@ -443,7 +458,7 @@ def run()
   end
 end
 
-def RSA_run(load=true,mesg="hello world")
+def RSA_run(mesg="hello world", load=true)
   STDOUT.flush
   rsa=RSA_encrypt.new()
 
@@ -495,7 +510,7 @@ def RSA_ask()
   puts "Input Message"
   mesg=gets.chomp
 
-  RSA_run(load,mesg)
+  RSA_run(mesg, load)
 
   puts "again? Y/N"
   again=gets.chomp
@@ -506,6 +521,32 @@ def RSA_ask()
     puts 'Bye'
   end
 end
+
+def RSA_no_q_run(mesg="hello world", encrypting=true, load="")
+  STDOUT.flush
+  rsa=RSA_encrypt.new()
+
+  case load
+  when true
+    rsa.keyload()
+  when false
+    rsa.make(17)
+  else
+    begin
+      rsa.keyload()
+    rescue
+      rsa.make(17)
+    end
+  end
+
+  case encrypting
+  when true
+    output=rsa.encrypt_splits(mesg) #auto includes @n & @e
+  else
+    output=rsa.decrypt_splits(mesg) #auto includes "@privatekey"<\paraphrase>
+  end
+end
+
 if __FILE__==$0
   RSA_ask()
   #run()
