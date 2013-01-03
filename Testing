@@ -141,3 +141,37 @@ print "Ran recursive once\n"
 recursive()
 
 
+#printing unprintable characters
+def stringfun(string)
+  concatenation=""
+  string.each_byte do |c|
+    if c >=040 and c<=0177 and c != 0134 and c!= 040 #"\" ascii code== 0134 and " " ascii code is 040
+      concatenation << c.chr
+    else
+      puts c
+      concatenation << "\\"+c.to_s+" "
+    end
+  end
+  puts concatenation
+end
+def undo_stringfun(string)
+  char_current=0
+  output=""
+  while char_current<string.length
+    if string[char_current]==0134
+      catch :charend
+        tempcharcode=""
+        while true
+          char_current=char_current+1
+          if string[char_current]==040 # " " ascii code
+            throw :charend
+          end
+          tempcharcode << string[char_current,char_current]
+
+        end
+
+      
+    else
+      output << string[char_current].chr
+    end
+    char_current+=1
