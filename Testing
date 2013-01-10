@@ -130,7 +130,7 @@ puts rsa.keysnil?
 
 
 
-
+=begin
 def recursive()
   def recursive()
     puts "hi"
@@ -139,17 +139,17 @@ end
 recursive()
 print "Ran recursive once\n"
 recursive()
-
+=end
 
 #printing unprintable characters
 def stringfun(string)
   concatenation=""
   string.each_byte do |c|
-    if c >=040 and c<=0177 and c != 0134 and c!= 040 #"\" ascii code== 0134 and " " ascii code is 040
+    if c >=040 and c<=0177 and c != 0134 #and c!= 040 #"\" ascii code== 0134 and " " ascii code is 040
       concatenation << c.chr
     else
       puts c
-      concatenation << "\\"+c.to_s+" "
+      concatenation << "\\"+c.to_s(8)+"\\"
     end
   end
   puts concatenation
@@ -159,19 +159,27 @@ def undo_stringfun(string)
   output=""
   while char_current<string.length
     if string[char_current]==0134
-      catch :charend
-        tempcharcode=""
+      tempcharcode=""
+      catch :charend do
         while true
           char_current=char_current+1
-          if string[char_current]==040 # " " ascii code
+          if string[char_current]==0134#040 # " " ascii code
             throw :charend
           end
           tempcharcode << string[char_current,char_current]
-
+          puts tempcharcode
         end
-
-      
+      end
+      output << tempcharcode.chr #      
     else
       output << string[char_current].chr
     end
     char_current+=1
+    puts output
+  end
+  puts output
+  output
+end
+
+x=stringfun("Hello World \040\013")
+undo_stringfun(gets.chomp)
