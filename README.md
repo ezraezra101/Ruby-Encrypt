@@ -70,3 +70,5 @@ Notes:
     #  else
     #      puts 'fail'
    #   end
+
+   http://web-development.meetup.com/cities/us/ny/ithaca/
