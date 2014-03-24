@@ -36,6 +36,26 @@ def rotate_13(input="hello world")
   decode
 end
 
+#does rotate on the all printable ascii characters
+def rotate_47(input="hello world")
+  decode= ''
+  ascii=[]
+  #converts to ascii
+  input.each_byte do |c|
+    ascii << c
+  end
+
+  for i in 0..ascii.length-1
+    if ascii[i]>=33 and ascii[i] <=126
+      ascii[i]+=47
+      if ascii[i]>126
+        ascii[i] += -94
+      end
+    end
+    decode << ascii[i].chr
+  end
+  decode
+end
 
 def pi_encrypt(input='hello world', to_code=true,seed=0)
   source = 3.1415926535897932384626433
